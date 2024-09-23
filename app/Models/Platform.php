@@ -11,7 +11,7 @@ class Platform extends Model
     use HasFactory;
     use SoftDeletes;
 
-/**
+    /**
      * La tabla asociada al modelo
      * 
      * @var string

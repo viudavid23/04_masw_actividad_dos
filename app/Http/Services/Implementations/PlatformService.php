@@ -6,7 +6,6 @@ use App\Exceptions\CantExecuteOperation;
 use App\Exceptions\Constants;
 use App\Http\Contracts\PlatformContract;
 use App\Exceptions\ElementAlreadyExists;
-use App\Exceptions\ElementNotFound;
 use App\Models\Platform;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -37,7 +36,6 @@ class PlatformService implements PlatformContract
             $platforms = Platform::paginate($page);
 
             if ($platforms->isEmpty()) {
-                error_log("Registros no encontrados en la base de datos");
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
             }
             return $platforms;

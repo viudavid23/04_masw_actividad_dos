@@ -8,7 +8,6 @@ use App\Http\Controllers\Validators\PlatformDataValidator;
 use App\Util\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Models\Platform;
 
 class PlatformController extends Controller
 {
@@ -66,7 +65,7 @@ class PlatformController extends Controller
        
         $data = $this->platformService->store($newPlatform);
 
-        return $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_SUCCESS_CODE, $data);
+        return $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_RECORD_SAVED, $data);
     }
 
     /**
@@ -80,7 +79,7 @@ class PlatformController extends Controller
 
         $data = $this->platformService->getDataResponse($platformSaved);
 
-        return $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_RECORD_SAVED, $data);
+        return $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_SUCCESS_CODE, $data);
     }
 
     /**
