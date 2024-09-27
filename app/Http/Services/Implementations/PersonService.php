@@ -230,7 +230,7 @@ class PersonService implements PersonContract
      * @param array $person The person array information.
      * @return Person The stored Person model.
      */
-    private function getPersonDeleted(array $person): Person|null
+    public function getPersonDeleted(array $person): Person|null
     {
         try {
             return Person::withTrashed()
