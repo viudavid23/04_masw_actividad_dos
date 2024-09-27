@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('actors', function (Blueprint $table) {
             $table->comment('Store actors information');
             $table->id();
-            $table->string('stage_name', 50)->nullable(true);
+            $table->string('stage_name', 50)->nullable();
             $table->text('biography', 50);
-            $table->text('awards', 50)->nullable(true);;
+            $table->text('awards', 50)->nullable();
             $table->decimal('height', 5, 2);
             $table->bigInteger('people_id', false, true);
             $table->timestamps();

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name', 50);
             $table->string('last_name', 50);
-            $table->dateTime('birthdate');
+            $table->date('birthdate');
             $table->bigInteger('country_id', false, true);
             $table->timestamps();
             $table->softDeletes();

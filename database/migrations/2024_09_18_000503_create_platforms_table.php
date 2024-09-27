@@ -15,9 +15,9 @@ return new class extends Migration
             $table->comment('Store platform information');
             $table->id();
             $table->string('name', 50);
-            $table->string('description', 100)->nullable(true);
-            $table->dateTime('release_date')->nullable(true);
-            $table->string('logo', 255)->nullable(true);
+            $table->string('description', 100)->nullable();
+            $table->date('release_date')->nullable();
+            $table->string('logo', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
