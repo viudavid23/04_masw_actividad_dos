@@ -51,7 +51,7 @@ class ActorService implements ActorContract
     }
 
     /**
-     * Get all People
+     * Get all Actors
      * @param int $page Number page.
      * @return LengthAwarePaginator The Actor set saved in database.
      * @throws HttpException If does not exist Actor records in the database, $page is invalid argument, occurs an error during the query or occurs a general error.
@@ -152,7 +152,7 @@ class ActorService implements ActorContract
     }
 
     /**
-     * Update People.
+     * Update Actor.
      * @param int $id Actor identifier.
      * @param array $currentActor Actor to will be update.
      * @return Actor The Actor updated in database.
