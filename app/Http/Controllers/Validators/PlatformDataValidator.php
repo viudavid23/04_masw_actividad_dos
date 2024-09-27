@@ -64,7 +64,7 @@ class PlatformDataValidator
      *
      * @param Request $request The HTTP Request containing the data for the Relative object.
      * @return array An array representation of the Relative object.
-     * @throws BadRequestException If the validation of Relative data fails.
+     * @throws HttpException If the validation of Person data fails return Bad Request HTTP.
      */
     public function createObjectPlatformRequest(Request $request): array
     {

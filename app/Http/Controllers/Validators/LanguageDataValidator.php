@@ -66,7 +66,7 @@ class LanguageDataValidator
      *
      * @param Request $request The HTTP Request containing the data for the Language object.
      * @return array An array representation of the Language object.
-     * @throws BadRequestException If the validation of Language data fails.
+     * @throws HttpException If the validation of Person data fails return Bad Request HTTP.
      */
     public function createObjectFromRequest(Request $request): array
     {
