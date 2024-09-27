@@ -109,17 +109,25 @@ class ActorService implements ActorContract
         try {
             return DB::transaction(function () use ($newActor, $newPerson) {
 
-                $deletedActor = $this->getActorDeleted($newActor);
+                $actorDeleted = $this->getActorDeleted($newActor);
 
-                if (!is_null($deletedActor)) {
+                if (!is_null($actorDeleted)) {
 
-                    $deletedActor->restore();
+                    $personDeleted = $this->personService->getPersonDeleted($newPerson);
 
-                    $deletedActor->fill($newActor);
+                    $personDeleted->restore();
 
-                    $deletedActor->save();
+                    $personDeleted->fill($newPerson);
 
-                    return $deletedActor;
+                    $personDeleted->save();
+
+                    $actorDeleted->restore();
+
+                    $actorDeleted->fill($newActor);
+
+                    $actorDeleted->save();
+
+                    return $actorDeleted;
                 } else {
 
                     $personSaved = $this->personService->store($newPerson);
@@ -170,7 +178,7 @@ class ActorService implements ActorContract
 
                 $elementsUpdated['person'] = $personUpdated;
                 $elementsUpdated['actor'] = $actorSaved;
-                
+
                 return $elementsUpdated;
             });
         } catch (QueryException $e) {
@@ -191,12 +199,14 @@ class ActorService implements ActorContract
 
             return DB::transaction(function () use ($id) {
 
-                $actor = $this->getById($id);
-                $actor->delete();
+                $actorDeleted = $this->getById($id);
+                $personId = $actorDeleted->people_id;
 
-                if (!is_null($actor->deleted_at)) {
+                $actorDeleted->delete();
 
-                    $this->personService->delete($actor->people_id);
+                if ($actorDeleted) {
+
+                    $this->personService->delete($personId);
                     return true;
                 }
             });
@@ -231,7 +241,7 @@ class ActorService implements ActorContract
         return $data;
     }
 
-     /**
+    /**
      * Make Data Response Object
      * @param array $elementsUpdated Actor and Person model
      * @return array actor array information
