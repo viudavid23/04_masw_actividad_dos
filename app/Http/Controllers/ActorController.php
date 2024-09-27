@@ -71,7 +71,9 @@ class ActorController extends Controller
 
         $newPerson = $this->personDataValidator->createObjectFromRequest($request);
 
-        $data = $this->actorService->store($newActor, $newPerson);
+        $personSaved = $this->actorService->store($newActor, $newPerson);
+
+        $data = $this->actorService->getDataResponse($personSaved);
 
         return $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_RECORD_SAVED, $data);
     }
