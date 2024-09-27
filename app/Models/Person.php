@@ -54,4 +54,13 @@ class Person extends Model
     {
         return $this->hasOne(Actor::class, 'people_id', 'id');
     }
+
+    /**
+     * Función encargada de definir la relación de llave foránea con la tabla director
+     * Argumentos: Modelo relacionado, columna que actua como llave foránea y columna de clave primaria
+     */
+    public function director()
+    {
+        return $this->hasOne(Director::class, 'people_id', 'id');
+    }
 }
