@@ -19,4 +19,6 @@ interface ActorContract{
     public function getDataResponse(Actor $actor);
 
     public function makeDataResponse(array $elementsUpdated);
+
+    public function getActorCountry($countryId);
 }

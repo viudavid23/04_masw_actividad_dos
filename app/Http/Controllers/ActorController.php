@@ -43,7 +43,7 @@ class ActorController extends Controller
                 'first_name' => $item->person->first_name,
                 'last_name' => $item->person->last_name,
                 'birthdate' => $item->person->birthdate,
-                'country_id' => $item->person->country_id,
+                'country' => $this->actorService->getActorCountry($item->person->country_id),
                 'stage_name' => $item->stage_name,
                 'biography' => $item->biography,
                 'awards' => $item->awards,

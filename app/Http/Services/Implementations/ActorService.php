@@ -7,9 +7,9 @@ use App\Exceptions\Constants;
 use App\Util\Utils;
 use App\Http\Contracts\ActorContract;
 use App\Exceptions\ElementAlreadyExists;
+use App\Http\Contracts\CountryContract;
 use App\Http\Contracts\PersonContract;
 use App\Models\Actor;
-use App\Models\Person;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -38,12 +38,16 @@ class ActorService implements ActorContract
     const LAST_NAME_FIELD = "last_name";
     const BIRTDATE_FIELD = "birthdate";
     const COUNTRY_ID_FIELD = "country_id";
+    const COUNTRY_OBJECT_FIELD = "country";
 
     protected PersonContract $personService;
 
-    public function __construct(PersonContract $personService)
+    protected CountryContract $countryService;
+
+    public function __construct(PersonContract $personService, CountryContract $countryService)
     {
         $this->personService = $personService;
+        $this->countryService = $countryService;
     }
 
     /**
@@ -224,12 +228,14 @@ class ActorService implements ActorContract
     public function getDataResponse(Actor $actor): array
     {
 
+        $country = $this->getActorCountry($actor->person->country_id);
+
         $data = [
             self::ID_FIELD => $actor->id,
             self::FIRST_NAME_FIELD => $actor->person->first_name,
             self::LAST_NAME_FIELD => $actor->person->last_name,
             self::BIRTDATE_FIELD => $actor->person->birthdate,
-            self::COUNTRY_ID_FIELD => $actor->person->country_id,
+            self::COUNTRY_OBJECT_FIELD => $country,
             self::STAGE_NAME_FIELD => $actor->stage_name,
             self::BIOGRAPHY_FIELD => $actor->biography,
             self::AWARDS_FIELD => $actor->awards,
@@ -251,13 +257,14 @@ class ActorService implements ActorContract
 
         $person = $elementsUpdated['person'];
         $actor = $elementsUpdated['actor'];
+        $country = $this->getActorCountry($person[self::COUNTRY_ID_FIELD]);
 
         $data = [
             self::ID_FIELD => $actor->id,
             self::FIRST_NAME_FIELD => $person[self::FIRST_NAME_FIELD],
             self::LAST_NAME_FIELD => $person[self::LAST_NAME_FIELD],
             self::BIRTDATE_FIELD => $person[self::BIRTDATE_FIELD],
-            self::COUNTRY_ID_FIELD => $person[self::COUNTRY_ID_FIELD],
+            self::COUNTRY_OBJECT_FIELD => $country,
             self::STAGE_NAME_FIELD => $actor[self::STAGE_NAME_FIELD],
             self::BIOGRAPHY_FIELD => $actor[self::BIOGRAPHY_FIELD],
             self::AWARDS_FIELD => $actor[self::AWARDS_FIELD],
@@ -267,6 +274,20 @@ class ActorService implements ActorContract
         ];
 
         return $data;
+    }
+
+    /**
+     * Get Actor Country
+     * @param int $countryId Country Identifier
+     */
+    public function getActorCountry($countryId)
+    {
+        $countrySaved = $this->countryService->getById($countryId);
+        $country = [];
+        $country['id'] = $countrySaved->id;
+        $country['name'] = $countrySaved->name;
+        $country['demonym'] = $countrySaved->demonym;
+        return $country;
     }
 
     /**
