@@ -14,6 +14,16 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class Utils
 {
 
+    const CREATED_AT_AUDIT_FIELD = 'created_at';
+    const UPDATED_AT_AUDIT_FIELD = 'updated_at';
+    const DELETED_AT_AUDIT_FIELD = 'deleted_at';
+    const CURRENT_PAGE_PAGINATE = 'current_page';
+    const DATA_PAGINATE = 'data';
+    const LAST_PAGE_PAGINATE = 'last_page';
+    const PER_PAGE_PAGINATE = 'per_page';
+    const TOTAL_PAGINATE = 'total';
+    const NUMBER_PAGE = 'page';
+
     public function __construct(){}
 
     /**
