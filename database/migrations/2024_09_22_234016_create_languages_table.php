@@ -14,12 +14,10 @@ return new class extends Migration
         Schema::create('languages', function (Blueprint $table) {
             $table->comment('Store languages information');
             $table->id();
-            $table->string('name', 50)->nullable(false);
-            $table->string('iso_code', 50)->unique()->nullable(false);
+            $table->string('name', 50);
+            $table->string('iso_code', 50)->unique();
             $table->timestamps();
             $table->softDeletes();
-            $table->primary('id');
-            $table->index('id');
         });
     }
 

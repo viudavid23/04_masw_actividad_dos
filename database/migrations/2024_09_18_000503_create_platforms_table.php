@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('platforms', function (Blueprint $table) {
             $table->comment('Store platform information');
             $table->id();
-            $table->string('name', 50)->nullable(false);
+            $table->string('name', 50);
             $table->string('description', 100)->nullable(true);
             $table->dateTime('release_date')->nullable(true);
             $table->string('logo', 255)->nullable(true);
             $table->timestamps();
             $table->softDeletes();
-            $table->primary('id');
-            $table->index('id');
         });
     }
 
