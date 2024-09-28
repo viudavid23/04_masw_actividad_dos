@@ -143,7 +143,7 @@ class LanguageService implements LanguageContract
                 throw new ElementAlreadyExists(Constants::TXT_RECORD_ALREADY_SAVED);
             }
 
-            $languageSaved->fill(array_filter($currentLanguage, fn($field) => $field !== null));
+            $languageSaved->fill(array_filter($currentLanguage, fn($field) => $field !== null, ARRAY_FILTER_USE_BOTH));
 
             $languageSaved->save();
 

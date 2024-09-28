@@ -160,7 +160,7 @@ class PersonService implements PersonContract
                     throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
                 }
 
-                $personSaved->fill(array_filter($currentPerson, fn($field) => $field !== null));
+                $personSaved->fill(array_filter($currentPerson, fn($field) => $field !== null, ARRAY_FILTER_USE_BOTH));
 
                 $personSaved->save();
 

@@ -131,7 +131,7 @@ class PlatformService implements PlatformContract
 
                 $platformSaved = $this->getById($id);
 
-                $platformSaved->fill(array_filter($currentPlatform, fn($field) => $field !== null));
+                $platformSaved->fill(array_filter($currentPlatform, fn($field) => $field !== null, ARRAY_FILTER_USE_BOTH));
 
                 $platformSaved->save();
 
