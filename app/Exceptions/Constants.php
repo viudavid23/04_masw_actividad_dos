@@ -24,5 +24,6 @@ class Constants{
     const TXT_INTERNAL_SERVER_ERROR_CODE = "Internal Server Error";
     const TXT_INVALID_PAGE_NUMBER = "Invalid Page Number";
     const TXT_DEFAULT_LANGUAGE = "The default language can not be updated/deleted";
+    const TXT_ID_ALREADY_RELATED_TO = "Can not update serie, it is related to other id";
 
 }
