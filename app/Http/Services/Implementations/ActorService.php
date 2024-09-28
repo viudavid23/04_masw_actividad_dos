@@ -34,6 +34,7 @@ class ActorService implements ActorContract
     const AWARDS_FIELD = "awards";
     const HEIGHT_FIELD = "height";
     const PEOPLE_ID_FIELD = "people_id";
+    const DOC_NUMBER_FIELD = "document_number";
     const FIRST_NAME_FIELD = "first_name";
     const LAST_NAME_FIELD = "last_name";
     const BIRTDATE_FIELD = "birthdate";
@@ -113,17 +114,11 @@ class ActorService implements ActorContract
         try {
             return DB::transaction(function () use ($newActor, $newPerson) {
 
-                $actorDeleted = $this->getActorDeleted($newActor);
+                $personSaved = $this->personService->store($newPerson);
+
+                $actorDeleted = $this->getActorDeleted($personSaved->id);
 
                 if (!is_null($actorDeleted)) {
-
-                    $personDeleted = $this->personService->getPersonDeleted($newPerson);
-
-                    $personDeleted->restore();
-
-                    $personDeleted->fill($newPerson);
-
-                    $personDeleted->save();
 
                     $actorDeleted->restore();
 
@@ -134,7 +129,11 @@ class ActorService implements ActorContract
                     return $actorDeleted;
                 } else {
 
-                    $personSaved = $this->personService->store($newPerson);
+                    $actorExists = $this->getExistingActorByPeopleId($personSaved->id);
+                    
+                    if ($actorExists) {
+                        throw new HttpException(Response::HTTP_CONFLICT, Constants::TXT_RECORD_ALREADY_SAVED);
+                    }
 
                     $newActor[self::PEOPLE_ID_FIELD] = $personSaved->id;
 
@@ -160,8 +159,6 @@ class ActorService implements ActorContract
      */
     public function update($id, array $currentActor, array $currentPerson)
     {
-
-        $this->validExistingActorById($id);
 
         try {
             return DB::transaction(function () use ($id, $currentActor, $currentPerson) {
@@ -196,9 +193,6 @@ class ActorService implements ActorContract
      */
     public function delete($id)
     {
-
-        $this->validExistingActorById($id);
-
         try {
 
             return DB::transaction(function () use ($id) {
@@ -232,6 +226,7 @@ class ActorService implements ActorContract
 
         $data = [
             self::ID_FIELD => $actor->id,
+            self::DOC_NUMBER_FIELD => $actor->person->document_number,
             self::FIRST_NAME_FIELD => $actor->person->first_name,
             self::LAST_NAME_FIELD => $actor->person->last_name,
             self::BIRTDATE_FIELD => $actor->person->birthdate,
@@ -261,6 +256,7 @@ class ActorService implements ActorContract
 
         $data = [
             self::ID_FIELD => $actor->id,
+            self::DOC_NUMBER_FIELD => $person[self::DOC_NUMBER_FIELD],
             self::FIRST_NAME_FIELD => $person[self::FIRST_NAME_FIELD],
             self::LAST_NAME_FIELD => $person[self::LAST_NAME_FIELD],
             self::BIRTDATE_FIELD => $person[self::BIRTDATE_FIELD],
@@ -291,35 +287,28 @@ class ActorService implements ActorContract
     }
 
     /**
-     * Valid existing Actor recorded by id.
+     * Get existing Actor recorded by people id.
      * 
-     * @param int $id The Actor id.
-     * @throws HttpException Not found exception if does not exist a record in database.
+     * @param int $peopleId The Actor people identification.
      */
-    private function validExistingActorById($id)
+    private function getExistingActorByPeopleId($peopleId)
     {
-        $actorExists = Actor::where(self::ID_FIELD, $id)->exists();
-
-        if (!$actorExists) {
-            throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
-        }
+        return Actor::where(self::PEOPLE_ID_FIELD, $peopleId)->exists();
     }
 
     /**
      * Get deleted record in database, if not exists does not return nothing.
      * 
-     * @param array $Actor The Actor array information.
+     * @param int $people_id The Director people identification.
      * @return Actor The stored Actor model.
      */
-    private function getActorDeleted(array $actor): Actor|null
+    private function getActorDeleted($peopleId): Actor|null
     {
         try {
             return Actor::withTrashed()
-                ->where(self::STAGE_NAME_FIELD, $actor[self::STAGE_NAME_FIELD])
-                ->where(self::BIOGRAPHY_FIELD, $actor[self::BIOGRAPHY_FIELD])
-                ->where(self::AWARDS_FIELD, $actor[self::AWARDS_FIELD])
-                ->whereNotNull(Utils::DELETED_AT_AUDIT_FIELD)
-                ->firstOrFail();
+            ->where(self::PEOPLE_ID_FIELD, $peopleId)
+            ->whereNotNull(Utils::DELETED_AT_AUDIT_FIELD)
+            ->firstOrFail();
         } catch (ModelNotFoundException $ex) {
 
             return null;

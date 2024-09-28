@@ -19,8 +19,6 @@ use Illuminate\Http\Response;
 use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-use function Ramsey\Uuid\v1;
-
 /**
  * Service class responsible to implement Director model logic
  * 
@@ -34,6 +32,7 @@ class DirectorService implements DirectorContract
     const BIOGRAPHY_FIELD = "biography";
     const AWARDS_FIELD = "awards";
     const PEOPLE_ID_FIELD = "people_id";
+    const DOC_NUMBER_FIELD = "document_number";
     const FIRST_NAME_FIELD = "first_name";
     const LAST_NAME_FIELD = "last_name";
     const BIRTDATE_FIELD = "birthdate";
@@ -113,17 +112,11 @@ class DirectorService implements DirectorContract
         try {
             return DB::transaction(function () use ($newDirector, $newPerson) {
 
-                $directorDeleted = $this->getDirectorDeleted($newDirector);
+                $personSaved = $this->personService->store($newPerson);
+
+                $directorDeleted = $this->getDirectorDeleted($personSaved->id);
 
                 if (!is_null($directorDeleted)) {
-
-                    $personDeleted = $this->personService->getPersonDeleted($newPerson);
-
-                    $personDeleted->restore();
-
-                    $personDeleted->fill($newPerson);
-
-                    $personDeleted->save();
 
                     $directorDeleted->restore();
 
@@ -134,7 +127,11 @@ class DirectorService implements DirectorContract
                     return $directorDeleted;
                 } else {
 
-                    $personSaved = $this->personService->store($newPerson);
+                    $directorExists = $this->getExistingDirectorByPeopleId($personSaved->id);
+                    
+                    if ($directorExists) {
+                        throw new HttpException(Response::HTTP_CONFLICT, Constants::TXT_RECORD_ALREADY_SAVED);
+                    }
 
                     $newDirector[self::PEOPLE_ID_FIELD] = $personSaved->id;
 
@@ -160,9 +157,6 @@ class DirectorService implements DirectorContract
      */
     public function update($id, array $currentDirector, array $currentPerson)
     {
-
-        $this->validExistingDirectorById($id);
-
         try {
             return DB::transaction(function () use ($id, $currentDirector, $currentPerson) {
 
@@ -196,9 +190,6 @@ class DirectorService implements DirectorContract
      */
     public function delete($id)
     {
-
-        $this->validExistingDirectorById($id);
-
         try {
 
             return DB::transaction(function () use ($id) {
@@ -210,7 +201,8 @@ class DirectorService implements DirectorContract
 
                 if ($directorDeleted) {
 
-                   return $this->personService->delete($personId);
+                    $this->personService->delete($personId);
+                    return true;
                 }
             });
         } catch (QueryException $e) {
@@ -231,6 +223,7 @@ class DirectorService implements DirectorContract
 
         $data = [
             self::ID_FIELD => $director->id,
+            self::DOC_NUMBER_FIELD => $director->person->document_number,
             self::FIRST_NAME_FIELD => $director->person->first_name,
             self::LAST_NAME_FIELD => $director->person->last_name,
             self::BIRTDATE_FIELD => $director->person->birthdate,
@@ -260,6 +253,7 @@ class DirectorService implements DirectorContract
 
         $data = [
             self::ID_FIELD => $director->id,
+            self::DOC_NUMBER_FIELD => $person[self::DOC_NUMBER_FIELD],
             self::FIRST_NAME_FIELD => $person[self::FIRST_NAME_FIELD],
             self::LAST_NAME_FIELD => $person[self::LAST_NAME_FIELD],
             self::BIRTDATE_FIELD => $person[self::BIRTDATE_FIELD],
@@ -290,34 +284,26 @@ class DirectorService implements DirectorContract
     }
 
     /**
-     * Valid existing Director recorded by id.
+     * Get existing Director recorded by people id.
      * 
-     * @param int $id The Director id.
-     * @throws HttpException Not found exception if does not exist a record in database.
+     * @param int $peopleId The Director people identification.
      */
-    private function validExistingDirectorById($id)
+    private function getExistingDirectorByPeopleId($peopleId)
     {
-        $directorExists = Director::where(self::ID_FIELD, $id)->exists();
-
-        if (!$directorExists) {
-            throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
-        }
+        return Director::where(self::PEOPLE_ID_FIELD, $peopleId)->exists();
     }
 
     /**
      * Get deleted record in database, if not exists does not return nothing.
      * 
-     * @param array $Director The Director array information.
+     * @param int $people_id The Director people identification.
      * @return Director The stored Director model.
      */
-    private function getDirectorDeleted(array $director): Director|null
+    private function getDirectorDeleted($peopleId): Director|null
     {
         try {
             return Director::withTrashed()
-                ->where(self::BEGINNING_CAREER_FIELD, $director[self::BEGINNING_CAREER_FIELD])
-                ->where(self::ACTIVE_YEARS_FIELD, $director[self::ACTIVE_YEARS_FIELD])
-                ->where(self::BIOGRAPHY_FIELD, $director[self::BIOGRAPHY_FIELD])
-                ->where(self::AWARDS_FIELD, $director[self::AWARDS_FIELD])
+                ->where(self::PEOPLE_ID_FIELD, $peopleId)
                 ->whereNotNull(Utils::DELETED_AT_AUDIT_FIELD)
                 ->firstOrFail();
         } catch (ModelNotFoundException $ex) {

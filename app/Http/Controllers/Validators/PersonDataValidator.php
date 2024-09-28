@@ -23,6 +23,7 @@ class PersonDataValidator
     {
         // Definition of validation rules
         $rules = [
+            'document_number' => 'required|string|min:1|max:15',
             'first_name' => 'required|string|min:1|max:50',
             'last_name' => 'required|string|min:1|max:50',
             'birthdate' => 'required|date|date_format:Y-m-d',
@@ -45,6 +46,7 @@ class PersonDataValidator
     public function createModelFromRequest(Request $request): Person
     {
         $fields = [
+            'document_number',
             'first_name',
             'last_name',
             'birthdate',

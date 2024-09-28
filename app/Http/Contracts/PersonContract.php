@@ -17,6 +17,4 @@ interface PersonContract{
     public function delete($id);
 
     public function getDataResponse(Person $person);
-
-    public function getPersonDeleted(array $person);
 }

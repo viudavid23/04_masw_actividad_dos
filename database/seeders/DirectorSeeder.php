@@ -21,7 +21,7 @@ class DirectorSeeder extends Seeder
             'active_years' => 25,
             'biography' => 'Director conocido por su estilo único.',
             'awards' => 'Oscar, Globo de Oro.',
-            'person_id' => 11
+            'people_id' => 11
         ]);
         
         Director::factory()->create([
@@ -30,7 +30,7 @@ class DirectorSeeder extends Seeder
             'active_years' => 20,
             'biography' => 'Ha dirigido varias películas aclamadas.',
             'awards' => 'BAFTA, Premio del Sindicato.',
-            'person_id' => 12
+            'people_id' => 12
         ]);
         
         Director::factory()->create([
@@ -39,7 +39,7 @@ class DirectorSeeder extends Seeder
             'active_years' => 35,
             'biography' => 'Reconocido por su trabajo en el cine independiente.',
             'awards' => 'Oscar, Palma de Oro.',
-            'person_id' => 13
+            'people_id' => 13
         ]);
         
         Director::factory()->create([
@@ -48,7 +48,7 @@ class DirectorSeeder extends Seeder
             'active_years' => 14,
             'biography' => 'Joven director en ascenso.',
             'awards' => 'Premio de la Crítica.',
-            'person_id' => 4
+            'people_id' => 4
         ]);
         
         Director::factory()->create([
@@ -57,7 +57,7 @@ class DirectorSeeder extends Seeder
             'active_years' => 28,
             'biography' => 'Ha trabajado con grandes actores.',
             'awards' => 'Globo de Oro, Emmy.',
-            'person_id' => 5
+            'people_id' => 5
         ]);        
 
         Director::reguard();

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('people', function (Blueprint $table) {
             $table->comment('Store people information');
             $table->id();
+            $table->string('document_number', 15)->unique();
             $table->string('first_name', 50);
             $table->string('last_name', 50);
             $table->date('birthdate');

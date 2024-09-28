@@ -40,6 +40,7 @@ class ActorController extends Controller
         $transformedItems = array_map(function ($item) {
             return [
                 'id' => $item->id,
+                'document_number' => $item->person->document_number,
                 'first_name' => $item->person->first_name,
                 'last_name' => $item->person->last_name,
                 'birthdate' => $item->person->birthdate,

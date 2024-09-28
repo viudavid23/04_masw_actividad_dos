@@ -25,6 +25,7 @@ class PersonService implements PersonContract
 {
 
     const ID_FIELD = "id";
+    const DOC_NUMBER_FIELD = "document_number";
     const FIRST_NAME_FIELD = "first_name";
     const LAST_NAME_FIELD = "last_name";
     const BIRTDATE_FIELD = "birthdate";
@@ -132,8 +133,6 @@ class PersonService implements PersonContract
     public function update($id, array $currentPerson)
     {
 
-        $this->validExistingPersonById($id);
-
         try {
 
             $personSaved = $this->getById($id);
@@ -142,11 +141,31 @@ class PersonService implements PersonContract
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
             }
 
-            $personSaved->fill(array_filter($currentPerson, fn($field) => $field !== null));
+            $deletedPerson = $this->getPersonDeleted($currentPerson);
 
-            $personSaved->save();
+            if (!is_null($deletedPerson)) {
 
-            return $personSaved;
+                $deletedPerson->restore();
+
+                $deletedPerson->fill($currentPerson);
+
+                $deletedPerson->save();
+
+                return $deletedPerson;
+            } else {
+
+                $personSaved = $this->getExistingPerson($currentPerson);
+
+                if (is_null($personSaved)) {
+                    throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
+                }
+
+                $personSaved->fill(array_filter($currentPerson, fn($field) => $field !== null));
+
+                $personSaved->save();
+
+                return $personSaved;
+            }
         } catch (QueryException $e) {
 
             throw new CantExecuteOperation(Constants::TXT_CANT_EXECUTE_OPERATION);
@@ -158,8 +177,6 @@ class PersonService implements PersonContract
      */
     public function delete($id)
     {
-
-        $this->validExistingPersonById($id);
 
         try {
 
@@ -184,6 +201,7 @@ class PersonService implements PersonContract
     {
         $data = [
             self::ID_FIELD => $person->id,
+            self::DOC_NUMBER_FIELD => $person->document_number,
             self::FIRST_NAME_FIELD => $person->first_name,
             self::LAST_NAME_FIELD => $person->last_name,
             self::BIRTDATE_FIELD => $person->birthdate,
@@ -202,42 +220,20 @@ class PersonService implements PersonContract
      */
     private function getExistingPerson(array $person): Person|null
     {
-        return Person::where(self::FIRST_NAME_FIELD, $person[self::FIRST_NAME_FIELD])
-        ->where(self::LAST_NAME_FIELD, $person[self::LAST_NAME_FIELD])
-        ->where(self::BIRTDATE_FIELD, $person[self::BIRTDATE_FIELD])
-        ->where(self::COUNTRY_ID_FIELD, $person[self::COUNTRY_ID_FIELD])
-        ->first();
-    }
-
-    /**
-     * Valid existing person recorded by id.
-     * 
-     * @param int $id The person id.
-     * @throws HttpException Not found exception if does not exist a record in database.
-     */
-    private function validExistingPersonById($id)
-    {
-        $personExists = Person::where(self::ID_FIELD, $id)->exists();
-
-        if (!$personExists) {
-            throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
-        }
+        return Person::where(self::DOC_NUMBER_FIELD, $person[self::DOC_NUMBER_FIELD])->first();
     }
 
     /**
      * Get deleted record in database, if not exists does not return nothing.
      * 
-     * @param array $person The person array information.
+     * @param array $person The person information.
      * @return Person The stored Person model.
      */
-    public function getPersonDeleted(array $person): Person|null
+    private function getPersonDeleted(array $person): Person|null
     {
         try {
             return Person::withTrashed()
-                ->where(self::FIRST_NAME_FIELD, $person[self::FIRST_NAME_FIELD])
-                ->where(self::LAST_NAME_FIELD, $person[self::LAST_NAME_FIELD])
-                ->where(self::BIRTDATE_FIELD, $person[self::BIRTDATE_FIELD])
-                ->where(self::COUNTRY_ID_FIELD, $person[self::COUNTRY_ID_FIELD])
+                ->where(self::DOC_NUMBER_FIELD, $person[self::DOC_NUMBER_FIELD])
                 ->whereNotNull(Utils::DELETED_AT_AUDIT_FIELD)
                 ->firstOrFail();
         } catch (ModelNotFoundException $ex) {
