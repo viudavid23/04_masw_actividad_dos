@@ -23,6 +23,9 @@ class Utils
     const PER_PAGE_PAGINATE = 'per_page';
     const TOTAL_PAGINATE = 'total';
     const NUMBER_PAGE = 'page';
+    const DEFAULT_NUMBER_PAGE = 1;
+    const PAGE_SIZE = 'pageSize';
+    const DEFAULT_PAGE_SIZE = 2;
     const ID_FIELD = 'id';
     const ACTIVE_STATUS_FIELD = "ACTIVO";
     const INACTIVE_STATUS_FIELD = "INACTIVO";

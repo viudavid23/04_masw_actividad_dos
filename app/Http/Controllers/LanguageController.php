@@ -28,9 +28,11 @@ class LanguageController extends Controller
     public function index(Request $request)
     {
 
-        $page = $request->query('page', 10);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
 
-        $languages = $this->languageService->getAll($page);
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $languages = $this->languageService->getAll($page, $pageSize);
 
         $items = $languages->items();
 

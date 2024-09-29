@@ -6,7 +6,7 @@ use App\Models\Person;
 
 interface PersonContract{
 
-    public function getAll($page);
+    public function getAll($page, $pageSize);
 
     public function getById($id);
 

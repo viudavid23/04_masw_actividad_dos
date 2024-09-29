@@ -23,6 +23,7 @@ class Constants{
     const TXT_FAILED_DEPENDENCY_CODE = "Failed Dependency";
     const TXT_INTERNAL_SERVER_ERROR_CODE = "Internal Server Error";
     const TXT_INVALID_PAGE_NUMBER = "Invalid Page Number";
+    const TXT_INVALID_PAGE_SIZE = "Invalid Page Size";
     const TXT_DEFAULT_LANGUAGE = "The default language can not be updated/deleted";
     const TXT_ID_ALREADY_RELATED_TO = "Can not update serie, it is related to other id";
 

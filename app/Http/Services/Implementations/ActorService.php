@@ -54,14 +54,24 @@ class ActorService implements ActorContract
     /**
      * Get all Actors
      * @param int $page Number page.
+     * @param int $pageSize Page size.
      * @return LengthAwarePaginator The Actor set saved in database.
      * @throws HttpException If does not exist Actor records in the database, $page is invalid argument, occurs an error during the query or occurs a general error.
      */
-    public function getAll($page): LengthAwarePaginator
+    public function getAll($page, $pageSize): LengthAwarePaginator
     {
 
         try {
-            $actors = Actor::with("person")->paginate($page);
+
+            if (!is_numeric($page) || $page <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
+            }
+    
+            if (!is_numeric($pageSize) || $pageSize <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_SIZE);
+            }
+            
+            $actors = Actor::with("person")->paginate($pageSize, ['*'], 'page', $page);
 
             if ($actors->isEmpty()) {
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);

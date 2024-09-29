@@ -4,7 +4,7 @@ namespace App\Http\Contracts;
 
 interface LanguageSerieContract{
 
-    public function getAll($page);
+    public function getAll($page, $pageSize);
 
     public function getBySerieId($id);
 

@@ -27,14 +27,24 @@ class PlatformService implements PlatformContract
     /**
      * Get all Platforms
      * @param int $page Number page.
+     * @param int $pageSize Page size.
      * @return LengthAwarePaginator The platform set saved in database.
      * @throws HttpException If does not exist platform records in the database, $page is invalid argument, occurs an error during the query or occurs a general error.
      */
-    public function getAll($page): LengthAwarePaginator
+    public function getAll($page, $pageSize): LengthAwarePaginator
     {
 
         try {
-            $platforms = Platform::paginate($page);
+
+            if (!is_numeric($page) || $page <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
+            }
+    
+            if (!is_numeric($pageSize) || $pageSize <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_SIZE);
+            }
+
+            $platforms = Platform::paginate($pageSize, ['*'], 'page', $page);
 
             if ($platforms->isEmpty()) {
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);

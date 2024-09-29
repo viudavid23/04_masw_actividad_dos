@@ -28,9 +28,11 @@ class DirectorSerieController extends Controller
     public function index(Request $request)
     {
 
-        $page = $request->query(Utils::NUMBER_PAGE, 10);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
 
-        $series = $this->directorSerieService->getAll($page);
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $series = $this->directorSerieService->getAll($page, $pageSize);
 
         $items = $series->items();
 

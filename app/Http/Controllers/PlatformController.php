@@ -29,9 +29,11 @@ class PlatformController extends Controller
     public function index(Request $request)
     {
 
-        $page = $request->query('page', 10);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
 
-        $platforms = $this->platformService->getAll($page);
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $platforms = $this->platformService->getAll($page, $pageSize);
 
         $items = $platforms->items();
 

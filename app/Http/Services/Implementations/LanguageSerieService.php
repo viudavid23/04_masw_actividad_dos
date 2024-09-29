@@ -59,11 +59,19 @@ class LanguageSerieService implements LanguageSerieContract
      * @return LengthAwarePaginator The serie set saved in database.
      * @throws HttpException If does not exist serie records in the database, $page is invalid argument, occurs an error during the query or occurs a general error.
      */
-    public function getAll($page): LengthAwarePaginator
+    public function getAll($page, $pageSize): LengthAwarePaginator
     {
 
         try {
-            $languageSeries = LanguageSerie::paginate($page);
+            if (!is_numeric($page) || $page <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
+            }
+    
+            if (!is_numeric($pageSize) || $pageSize <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_SIZE);
+            }
+
+            $languageSeries = LanguageSerie::paginate($pageSize, ['*'], 'page', $page);
 
             if ($languageSeries->isEmpty()) {
                 Log::warning("LANGUAGE_SERIE Records not found in database");

@@ -27,14 +27,23 @@ class LanguageService implements LanguageContract
     /**
      * Get all Languages
      * @param int $page Number page.
+     * @param int $pageSize Page size.
      * @return LengthAwarePaginator The Language set saved in database.
      * @throws HttpException If does not exist Language records in the database, $page is invalid argument, occurs an error during the query or occurs a general error.
      */
-    public function getAll($page): LengthAwarePaginator
+    public function getAll($page, $pageSize): LengthAwarePaginator
     {
 
         try {
-            $languages = Language::paginate($page);
+            if (!is_numeric($page) || $page <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
+            }
+    
+            if (!is_numeric($pageSize) || $pageSize <= 0) {
+                throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_SIZE);
+            }
+
+            $languages = Language::paginate($pageSize, ['*'], 'page', $page);
 
             if ($languages->isEmpty()) {
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);

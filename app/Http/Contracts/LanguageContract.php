@@ -6,7 +6,7 @@ use App\Models\Language;
 
 interface LanguageContract{
 
-    public function getAll($page);
+    public function getAll($page, $pageSize);
 
     public function getById($id);
 

@@ -28,9 +28,11 @@ class ActorSerieController extends Controller
     public function index(Request $request)
     {
 
-        $page = $request->query(Utils::NUMBER_PAGE, 10);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
 
-        $series = $this->actorSerieService->getAll($page);
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $series = $this->actorSerieService->getAll($page, $pageSize);
 
         $items = $series->items();
 
@@ -70,11 +72,15 @@ class ActorSerieController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showBySerie($id)
+    public function showBySerie($id, Request $request)
     {
         $this->utils->isNumericValidArgument($id);
 
-        $actorSeriesSaved = $this->actorSerieService->getBySerieId($id);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
+
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $actorSeriesSaved = $this->actorSerieService->getBySerieId($id, $page, $pageSize);
 
         $data = $this->actorSerieService->getActorDataResponse($actorSeriesSaved);
 
@@ -84,11 +90,15 @@ class ActorSerieController extends Controller
     /**
      * Display the specified resource.
      */
-    public function showByActor($id)
+    public function showByActor($id, Request $request)
     {
         $this->utils->isNumericValidArgument($id);
 
-        $seriesActorSaved = $this->actorSerieService->getByActorId($id);
+        $page = $request->query(Utils::NUMBER_PAGE, Utils::DEFAULT_NUMBER_PAGE);
+
+        $pageSize = $request->query(Utils::PAGE_SIZE,  Utils::DEFAULT_PAGE_SIZE);
+
+        $seriesActorSaved = $this->actorSerieService->getByActorId($id, $page, $pageSize);
 
         $data = $this->actorSerieService->getSerieDataResponse($seriesActorSaved);
 
