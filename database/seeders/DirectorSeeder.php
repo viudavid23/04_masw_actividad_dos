@@ -21,7 +21,9 @@ class DirectorSeeder extends Seeder
             'active_years' => 25,
             'biography' => 'Director conocido por su estilo único.',
             'awards' => 'Oscar, Globo de Oro.',
-            'people_id' => 11
+            'people_id' => 11,
+            'created_at' => '2024-09-01T05:14:32.000000Z',
+            'updated_at' => '2024-09-01T05:14:32.000000Z', 
         ]);
         
         Director::factory()->create([
@@ -30,7 +32,9 @@ class DirectorSeeder extends Seeder
             'active_years' => 20,
             'biography' => 'Ha dirigido varias películas aclamadas.',
             'awards' => 'BAFTA, Premio del Sindicato.',
-            'people_id' => 12
+            'people_id' => 12,
+            'created_at' => '2024-09-02T06:15:32.000000Z',
+            'updated_at' => '2024-09-02T06:15:32.000000Z', 
         ]);
         
         Director::factory()->create([
@@ -39,7 +43,9 @@ class DirectorSeeder extends Seeder
             'active_years' => 35,
             'biography' => 'Reconocido por su trabajo en el cine independiente.',
             'awards' => 'Oscar, Palma de Oro.',
-            'people_id' => 13
+            'people_id' => 13,
+            'created_at' => '2024-09-03T07:16:32.000000Z',
+            'updated_at' => '2024-09-04T08:17:32.000000Z',
         ]);
         
         Director::factory()->create([
@@ -48,7 +54,9 @@ class DirectorSeeder extends Seeder
             'active_years' => 14,
             'biography' => 'Joven director en ascenso.',
             'awards' => 'Premio de la Crítica.',
-            'people_id' => 4
+            'people_id' => 4,
+            'created_at' => '2024-09-05T09:18:32.000000Z',
+            'updated_at' => '2024-09-05T09:18:32.000000Z', 
         ]);
         
         Director::factory()->create([
@@ -57,8 +65,10 @@ class DirectorSeeder extends Seeder
             'active_years' => 28,
             'biography' => 'Ha trabajado con grandes actores.',
             'awards' => 'Globo de Oro, Emmy.',
-            'people_id' => 5
-        ]);        
+            'people_id' => 5,
+            'created_at' => '2024-09-06T10:19:32.000000Z',
+            'updated_at' => '2024-09-06T10:19:32.000000Z', 
+        ]);                
 
         Director::reguard();
     }
