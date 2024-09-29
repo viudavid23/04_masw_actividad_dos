@@ -12,7 +12,7 @@ class ActorSeeder extends Seeder
      */
     public function run(): void
     {
-         // Person::factory(10)->create();
+         // Actor::factory(10)->create();
          Actor::unguard();
 
          Actor::factory()->create([
