@@ -35,25 +35,25 @@ class ActorSerieDataValidator
     }
 
     /**
-     * Create and return an array representing the Director object from the given Request.
+     * Create and return an array representing the Actor object from the given Request.
      *
-     * @param Request $request The HTTP Request containing the data for the Director object.
-     * @return array An array representation of the Director object.
-     * @throws HttpException If the validation of Director data fails return Bad Request HTTP.
+     * @param Request $request The HTTP Request containing the data for the Actor object.
+     * @return array An array representation of the Actor object.
+     * @throws HttpException If the validation of Actor data fails return Bad Request HTTP.
      */
     public function createObjectFromRequest(Request $request): array
     {
 
         $utils = new Utils();
 
-        $validationDirectorResult = $this->validate($request);
+        $validationResult = $this->validate($request);
 
-        if ($utils->isValidationFailed($validationDirectorResult)) {
+        if ($utils->isValidationFailed($validationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationDirectorResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationDirectorResult, function ($value) {
+        return array_filter((array) $validationResult, function ($value) {
             return $value != null;
         });
     }
