@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Validators;
 
 use App\Util\Utils;
-use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -38,30 +37,6 @@ class PersonDataValidator
     }
 
     /**
-     * Map an object from the data received in the request.
-     * 
-     * @param Request $request. The incoming request.
-     * @return Person $person The Person object mapped.
-     */
-    public function createModelFromRequest(Request $request): Person
-    {
-        $fields = [
-            'document_number',
-            'first_name',
-            'last_name',
-            'birthdate',
-            'country_id'
-        ];
-
-        $person = new Person();
-
-        $person->fill($request->only($fields));
-
-        return $person;
-    }
-
-    
-    /**
      * Create and return an array representing the Person object from the given Request.
      *
      * @param Request $request The HTTP Request containing the data for the Person object.
@@ -73,14 +48,14 @@ class PersonDataValidator
 
         $utils = new Utils();
 
-        $validationPersonResult = $this->validate($request);
+        $validationResult = $this->validate($request);
 
-        if ($utils->isValidationFailed($validationPersonResult)) {
+        if ($utils->isValidationFailed($validationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationPersonResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationPersonResult, function ($value) {
+        return array_filter((array) $validationResult, function ($value) {
             return $value != null;
         });
     }

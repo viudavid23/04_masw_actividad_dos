@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Validators;
 
 use App\Util\Utils;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -41,27 +40,6 @@ class LanguageDataValidator
     }
 
     /**
-     * Map an object from the data received in the request.
-     * 
-     * @param Request $request. The incoming request.
-     * @return Language The Language object mapped.
-     */
-    public function createModelFromRequest(Request $request): Language
-    {
-        $fields = [
-            'name',
-            'iso_code'
-        ];
-
-        $Language = new Language();
-
-        $Language->fill($request->only($fields));
-
-        return $Language;
-    }
-
-    
-    /**
      * Create and return an array representing the Language object from the given Request.
      *
      * @param Request $request The HTTP Request containing the data for the Language object.
@@ -73,14 +51,14 @@ class LanguageDataValidator
 
         $utils = new Utils();
 
-        $validationLanguageResult = $this->validate($request);
+        $validationResult = $this->validate($request);
 
-        if ($utils->isValidationFailed($validationLanguageResult)) {
+        if ($utils->isValidationFailed($validationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationLanguageResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationLanguageResult, function ($value) {
+        return array_filter((array) $validationResult, function ($value) {
             return $value != null;
         });
     }

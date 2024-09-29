@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Validators;
 
 use App\Util\Utils;
-use App\Models\Platform;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -37,33 +36,10 @@ class PlatformDataValidator
     }
 
     /**
-     * Map an object from the data received in the request.
-     * 
-     * @param Request $request. The incoming request.
-     * @return Platform The Relative object mapped.
-     */
-    public function createModelFromRequest(Request $request): Platform
-    {
-        $fields = [
-            'name',
-            'description',
-            'release_date',
-            'logo', 
-        ];
-
-        $platform = new Platform();
-
-        $platform->fill($request->only($fields));
-
-        return $platform;
-    }
-
-    
-    /**
-     * Create and return an array representing the Relative object from the given Request.
+     * Create and return an array representing the Platform object from the given Request.
      *
-     * @param Request $request The HTTP Request containing the data for the Relative object.
-     * @return array An array representation of the Relative object.
+     * @param Request $request The HTTP Request containing the data for the Platform object.
+     * @return array An array representation of the Platform object.
      * @throws HttpException If the validation of Person data fails return Bad Request HTTP.
      */
     public function createObjectPlatformRequest(Request $request): array
@@ -71,14 +47,14 @@ class PlatformDataValidator
 
         $utils = new Utils();
 
-        $validationPlatformResult = $this->validatePlatformData($request);
+        $validationResult = $this->validatePlatformData($request);
 
-        if ($utils->isValidationFailed($validationPlatformResult)) {
+        if ($utils->isValidationFailed($validationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationPlatformResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationPlatformResult, function ($value) {
+        return array_filter((array) $validationResult, function ($value) {
             return $value != null;
         });
     }

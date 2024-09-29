@@ -35,25 +35,25 @@ class PlatformSerieDataValidator
     }
 
     /**
-     * Create and return an array representing the Director object from the given Request.
+     * Create and return an array representing the PlatformSerie object from the given Request.
      *
-     * @param Request $request The HTTP Request containing the data for the Director object.
-     * @return array An array representation of the Director object.
-     * @throws HttpException If the validation of Director data fails return Bad Request HTTP.
+     * @param Request $request The HTTP Request containing the data for the PlatformSerie object.
+     * @return array An array representation of the PlatformSerie object.
+     * @throws HttpException If the validation of PlatformSerie data fails return Bad Request HTTP.
      */
     public function createObjectFromRequest(Request $request): array
     {
 
         $utils = new Utils();
 
-        $validationDirectorResult = $this->validate($request);
+        $SerievalidationResult = $this->validate($request);
 
-        if ($utils->isValidationFailed($validationDirectorResult)) {
+        if ($utils->isValidationFailed($SerievalidationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationDirectorResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $SerievalidationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationDirectorResult, function ($value) {
+        return array_filter((array) $SerievalidationResult, function ($value) {
             return $value != null;
         });
     }

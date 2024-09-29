@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Validators;
 
 use App\Util\Utils;
-use App\Models\Director;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
@@ -37,30 +36,6 @@ class DirectorDataValidator
     }
 
     /**
-     * Map an object from the data received in the request.
-     * 
-     * @param Request $request. The incoming request.
-     * @return Director The Director object mapped.
-     */
-    public function createModelFromRequest(Request $request): Director
-    {
-        $fields = [
-            'beginning_career',
-            'active_years',
-            'biography',
-            'awards',
-            'people_id'
-        ];
-
-        $director = new Director();
-
-        $director->fill($request->only($fields));
-
-        return $director;
-    }
-
-    
-    /**
      * Create and return an array representing the Director object from the given Request.
      *
      * @param Request $request The HTTP Request containing the data for the Director object.
@@ -72,14 +47,14 @@ class DirectorDataValidator
 
         $utils = new Utils();
 
-        $validationDirectorResult = $this->validate($request);
+        $validationResult = $this->validate($request);
 
-        if ($utils->isValidationFailed($validationDirectorResult)) {
+        if ($utils->isValidationFailed($validationResult)) {
 
-            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationDirectorResult->getMessageBag() );
+            throw new HttpException(Response::HTTP_BAD_REQUEST, $validationResult->getMessageBag() );
         }
 
-        return array_filter((array) $validationDirectorResult, function ($value) {
+        return array_filter((array) $validationResult, function ($value) {
             return $value != null;
         });
     }
