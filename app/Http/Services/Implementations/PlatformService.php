@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -65,6 +66,7 @@ class PlatformService implements PlatformContract
 
             return $platformSaved;
         } catch (ModelNotFoundException $e) {
+            Log::warning("PLATFORM_ID {$id} no registrado en la base de datos. Tracking: Code: {$e->getCode()} Message: {$e->getMessage()}");
             throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
         } catch (QueryException $e) {
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);

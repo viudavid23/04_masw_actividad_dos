@@ -23,6 +23,7 @@ class Utils
     const PER_PAGE_PAGINATE = 'per_page';
     const TOTAL_PAGINATE = 'total';
     const NUMBER_PAGE = 'page';
+    const ID_FIELD = 'id';
 
     public function __construct(){}
 

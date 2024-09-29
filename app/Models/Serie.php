@@ -35,4 +35,13 @@ class Serie extends Model
     public $timestamps = true;
 
     protected $dates = ['deleted_at'];
+
+    // Many to Many realation with Platform
+    public function platforms()
+    {
+        return $this->belongsToMany(Platform::class, 'platform_series', 'serie_id', 'platform_id','id','id')
+                    ->using(PlatformSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }
