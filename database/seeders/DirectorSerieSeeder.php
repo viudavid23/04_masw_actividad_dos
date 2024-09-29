@@ -12,7 +12,7 @@ class DirectorSerieSeeder extends Seeder
      */
     public function run(): void
     {
-        // Director::factory(10)->create();
+        // DirectorSerie::factory(10)->create();
         DirectorSerie::unguard();
 
         DirectorSerie::factory()->create([

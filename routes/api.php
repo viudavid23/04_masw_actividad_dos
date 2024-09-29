@@ -4,6 +4,7 @@ use App\Http\Controllers\ActorSerieController;
 use App\Http\Controllers\DirectorController;
 use App\Http\Controllers\DirectorSerieController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\LanguageSerieController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\PlatformSerieController;
 use App\Http\Controllers\SerieController;
@@ -71,6 +72,15 @@ Route::prefix('director-series')->controller(DirectorSerieController::class)->na
     Route::get('/', 'index');
     Route::get('/serie/{id}', 'showBySerie');
     Route::get('/director/{id}', 'showByDirector');
+    Route::post('/', 'store');
+    Route::patch('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+});
+
+Route::prefix('language-series')->controller(LanguageSerieController::class)->name('language series.')->group(function () {
+    Route::get('/', 'index');
+    Route::get('/serie/{id}', 'showBySerie');
+    Route::get('/language/{id}', 'showByLanguage');
     Route::post('/', 'store');
     Route::patch('/{id}', 'update');
     Route::delete('/{id}', 'destroy');

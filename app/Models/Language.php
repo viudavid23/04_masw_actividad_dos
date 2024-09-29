@@ -34,4 +34,13 @@ class Language extends Model
     public $timestamps = true;
 
     protected $dates = ['deleted_at'];
+
+    // Many to Many realation with series
+    public function series()
+    {
+        return $this->belongsToMany(Serie::class, 'language_series', 'language_id', 'serie_id','id','id')
+                    ->using(LanguageSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }

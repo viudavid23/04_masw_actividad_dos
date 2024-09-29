@@ -62,4 +62,13 @@ class Serie extends Model
                     ->withPivot('deleted_at')
                     ->withTimestamps();
     }
+
+    // Many to Many realation with Language
+    public function languages()
+    {
+        return $this->belongsToMany(Language::class, 'language_series', 'serie_id', 'language_id','id','id')
+                    ->using(LanguageSerie::class)
+                    ->withPivot('deleted_at','language_id', 'audio', 'subtitle')
+                    ->withTimestamps();
+    }
 }

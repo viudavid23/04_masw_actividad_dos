@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MasterSeeder extends Seeder
@@ -24,7 +23,8 @@ class MasterSeeder extends Seeder
             PlatformSerieSeeder::class,
             ActorSerieSeeder::class,
             DirectorSerieSeeder::class,
-            
+            LanguageSerieSeeder::class,
+            //add your seeder
         ]);
     }
 }

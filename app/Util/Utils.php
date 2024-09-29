@@ -24,6 +24,8 @@ class Utils
     const TOTAL_PAGINATE = 'total';
     const NUMBER_PAGE = 'page';
     const ID_FIELD = 'id';
+    const ACTIVE_STATUS_FIELD = "ACTIVO";
+    const INACTIVE_STATUS_FIELD = "INACTIVO";
 
     public function __construct(){}
 
