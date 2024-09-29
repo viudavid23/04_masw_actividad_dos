@@ -53,4 +53,13 @@ class Serie extends Model
                     ->withPivot('deleted_at')
                     ->withTimestamps();
     }
+
+    // Many to Many realation with Director
+    public function directors()
+    {
+        return $this->belongsToMany(Director::class, 'director_series', 'serie_id', 'director_id','id','id')
+                    ->using(DirectorSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }

@@ -2,6 +2,7 @@
 use App\Http\Controllers\ActorController;
 use App\Http\Controllers\ActorSerieController;
 use App\Http\Controllers\DirectorController;
+use App\Http\Controllers\DirectorSerieController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\PlatformSerieController;
@@ -61,6 +62,15 @@ Route::prefix('actor-series')->controller(ActorSerieController::class)->name('ac
     Route::get('/', 'index');
     Route::get('/serie/{id}', 'showBySerie');
     Route::get('/actor/{id}', 'showByActor');
+    Route::post('/', 'store');
+    Route::patch('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+});
+
+Route::prefix('director-series')->controller(DirectorSerieController::class)->name('director series.')->group(function () {
+    Route::get('/', 'index');
+    Route::get('/serie/{id}', 'showBySerie');
+    Route::get('/director/{id}', 'showByDirector');
     Route::post('/', 'store');
     Route::patch('/{id}', 'update');
     Route::delete('/{id}', 'destroy');

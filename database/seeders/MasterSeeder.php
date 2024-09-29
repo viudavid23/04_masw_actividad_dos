@@ -23,7 +23,8 @@ class MasterSeeder extends Seeder
             SerieSeeder::class,
             PlatformSerieSeeder::class,
             ActorSerieSeeder::class,
-
+            DirectorSerieSeeder::class,
+            
         ]);
     }
 }

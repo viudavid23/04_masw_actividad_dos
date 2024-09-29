@@ -47,4 +47,12 @@ class Director extends Model
         return $this->belongsTo(Person::class, 'people_id', 'id');
     }
 
+    // Many to Many realation with series
+    public function series()
+    {
+        return $this->belongsToMany(Serie::class, 'director_series', 'director_id', 'serie_id','id','id')
+                    ->using(DirectorSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }
