@@ -41,9 +41,9 @@ class ActorService implements ActorContract
     const COUNTRY_ID_FIELD = "country_id";
     const COUNTRY_OBJECT_FIELD = "country";
 
-    protected PersonContract $personService;
+    protected $personService;
 
-    protected CountryContract $countryService;
+    protected $countryService;
 
     public function __construct(PersonContract $personService, CountryContract $countryService)
     {

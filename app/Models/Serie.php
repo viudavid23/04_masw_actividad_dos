@@ -44,4 +44,13 @@ class Serie extends Model
                     ->withPivot('deleted_at')
                     ->withTimestamps();
     }
+
+    // Many to Many realation with Actor
+    public function actors()
+    {
+        return $this->belongsToMany(Actor::class, 'actor_series', 'serie_id', 'actor_id','id','id')
+                    ->using(ActorSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }

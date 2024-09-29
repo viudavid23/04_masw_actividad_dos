@@ -46,4 +46,13 @@ class Actor extends Model
 
         return $this->belongsTo(Person::class, 'people_id', 'id');
     }
+
+    // Many to Many realation with series
+    public function series()
+    {
+        return $this->belongsToMany(Serie::class, 'actor_series', 'actor_id', 'serie_id','id','id')
+                    ->using(ActorSerie::class)
+                    ->withPivot('deleted_at')
+                    ->withTimestamps();
+    }
 }

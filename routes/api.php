@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\ActorController;
+use App\Http\Controllers\ActorSerieController;
 use App\Http\Controllers\DirectorController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PlatformController;
@@ -51,6 +52,15 @@ Route::prefix('platform-series')->controller(PlatformSerieController::class)->na
     Route::get('/', 'index');
     Route::get('/serie/{id}', 'showBySerie');
     Route::get('/platform/{id}', 'showByPlatform');
+    Route::post('/', 'store');
+    Route::patch('/{id}', 'update');
+    Route::delete('/{id}', 'destroy');
+});
+
+Route::prefix('actor-series')->controller(ActorSerieController::class)->name('actor series.')->group(function () {
+    Route::get('/', 'index');
+    Route::get('/serie/{id}', 'showBySerie');
+    Route::get('/actor/{id}', 'showByActor');
     Route::post('/', 'store');
     Route::patch('/{id}', 'update');
     Route::delete('/{id}', 'destroy');
