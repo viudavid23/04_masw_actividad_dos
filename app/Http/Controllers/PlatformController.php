@@ -46,11 +46,11 @@ class PlatformController extends Controller
         }, $items);
 
         $data = [
-            'current_page' => $platforms->currentPage(),
-            'data' => $transformedItems,
-            'last_page' => $platforms->lastPage(),
-            'per_page' => $platforms->perPage(),
-            'total' => $platforms->total()
+            Utils::CURRENT_PAGE_PAGINATE => $platforms->currentPage(),
+            Utils::DATA_PAGINATE => $transformedItems,
+            Utils::LAST_PAGE_PAGINATE => $platforms->lastPage(),
+            Utils::PER_PAGE_PAGINATE => $platforms->perPage(),
+            Utils::TOTAL_PAGINATE => $platforms->total()
         ];
 
         return  $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_SUCCESS_CODE, $data);

@@ -43,11 +43,11 @@ class LanguageController extends Controller
         }, $items);
 
         $data = [
-            'current_page' => $languages->currentPage(),
-            'data' => $transformedItems,
-            'last_page' => $languages->lastPage(),
-            'per_page' => $languages->perPage(),
-            'total' => $languages->total()
+            Utils::CURRENT_PAGE_PAGINATE => $languages->currentPage(),
+            Utils::DATA_PAGINATE => $transformedItems,
+            Utils::LAST_PAGE_PAGINATE => $languages->lastPage(),
+            Utils::PER_PAGE_PAGINATE => $languages->perPage(),
+            Utils::TOTAL_PAGINATE => $languages->total()
         ];
 
         return  $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_SUCCESS_CODE, $data);

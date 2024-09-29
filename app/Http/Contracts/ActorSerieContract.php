@@ -20,5 +20,5 @@ interface ActorSerieContract{
 
     public function getActorDataResponse(array $actorSeries);
 
-    public function getSerieDataResponse(array $serieActotors);
+    public function getSerieDataResponse(array $serieActors);
 }

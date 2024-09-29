@@ -42,11 +42,11 @@ class PlatformSerieController extends Controller
         }, $items);
 
         $data = [
-            'current_page' => $series->currentPage(),
-            'data' => $this->platformSerieService->getDataResponse($transformedItems),
-            'last_page' => $series->lastPage(),
-            'per_page' => $series->perPage(),
-            'total' => $series->total()
+            Utils::CURRENT_PAGE_PAGINATE => $series->currentPage(),
+            Utils::DATA_PAGINATE => $this->platformSerieService->getDataResponse($transformedItems),
+            Utils::LAST_PAGE_PAGINATE => $series->lastPage(),
+            Utils::PER_PAGE_PAGINATE => $series->perPage(),
+            Utils::TOTAL_PAGINATE => $series->total()
         ];
 
         return  $this->utils->createResponse(Response::HTTP_OK, Constants::TXT_SUCCESS_CODE, $data);
