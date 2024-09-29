@@ -59,7 +59,9 @@ class ActorSerieService implements ActorSerieContract
     const ACTOR_FIRST_NAME_FIELD = "first_name";
     const ACTOR_LAST_NAME_FIELD = "last_name";
     const ACTOR_BIRTDATE_FIELD = "birthdate";
-    const ACTOR_COUNTRY_ID_FIELD = "country_id";
+    const ACTOR_COUNTRY_ID_FIELD = "id";
+    const ACTOR_COUNTRY_NAME_FIELD = "name";
+    const ACTOR_COUNTRY_DEMONYM_FIELD = "demonym";
     const ACTOR_COUNTRY_OBJECT_FIELD = "country";
 
     /**
@@ -288,6 +290,7 @@ class ActorSerieService implements ActorSerieContract
         $actorIds = array_diff($actorIds, $actorIdsDeleted);
 
         if (empty($actorIds)) {
+            Log::warning("Los actores de la serie {$serieId} ya han sido eliminados de la tabla ACTOR_SERIE");
             throw new HttpException(Response::HTTP_CONFLICT, Constants::TXT_RECORD_DOESNT_SAVED);
         }
     }
@@ -360,6 +363,11 @@ class ActorSerieService implements ActorSerieContract
         return $data;
     }
 
+    /**
+     * Make Serie Object
+     * @param Serie $serie Serie model
+     * @return array Serie object built
+     */
     private function makeSerieObject(Serie $serie)
     {
         return [
@@ -372,8 +380,14 @@ class ActorSerieService implements ActorSerieContract
         ];
     }
 
+    /**
+     * Make Actor Object
+     * @param Actor $actor Actor model
+     * @return array Actor object built
+     */
     private function makeActorObject(Actor $actor)
     {
+        $person = $actor->person;
         $country = $this->getActorCountry($actor->person->country_id);
 
         return [
@@ -383,10 +397,10 @@ class ActorSerieService implements ActorSerieContract
             self::ACTOR_AWARDS_FIELD => $actor->awards,
             self::ACTOR_HEIGHT_FIELD => $actor->height,
             self::ACTOR_PEOPLE_ID_FIELD => $actor->people_id,
-            self::ACTOR_DOC_NUMBER_FIELD => $actor->person->document_number,
-            self::ACTOR_FIRST_NAME_FIELD => $actor->person->first_name,
-            self::ACTOR_LAST_NAME_FIELD => $actor->person->last_name,
-            self::ACTOR_BIRTDATE_FIELD => $actor->person->birthdate,
+            self::ACTOR_DOC_NUMBER_FIELD => $person->document_number,
+            self::ACTOR_FIRST_NAME_FIELD => $person->first_name,
+            self::ACTOR_LAST_NAME_FIELD => $person->last_name,
+            self::ACTOR_BIRTDATE_FIELD => $person->birthdate,
             self::ACTOR_COUNTRY_OBJECT_FIELD => $country,
             Utils::CREATED_AT_AUDIT_FIELD => $actor->created_at,
             Utils::UPDATED_AT_AUDIT_FIELD => $actor->updated_at,
@@ -401,9 +415,9 @@ class ActorSerieService implements ActorSerieContract
     {
         $countrySaved = $this->countryService->getById($countryId);
         $country = [];
-        $country['id'] = $countrySaved->id;
-        $country['name'] = $countrySaved->name;
-        $country['demonym'] = $countrySaved->demonym;
+        $country[self::ACTOR_COUNTRY_ID_FIELD] = $countrySaved->id;
+        $country[self::ACTOR_COUNTRY_NAME_FIELD] = $countrySaved->name;
+        $country[self::ACTOR_COUNTRY_DEMONYM_FIELD] = $countrySaved->demonym;
         return $country;
     }
 
