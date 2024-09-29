@@ -64,14 +64,18 @@ class PlatformSerieService implements PlatformSerieContract
             $platformSeries = PlatformSerie::paginate($page);
 
             if ($platformSeries->isEmpty()) {
+                Log::warning("´PLATFORM_SERIE Records not found in database");
                 throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
             }
             return $platformSeries;
         } catch (InvalidArgumentException $e) {
+            Log::warning("PLATFORM_SERIE PAGING {$page} invalid. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
         } catch (QueryException $e) {
+            Log::error("Get PLATFORM_SERIE paginated by page {$page} failed. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);
         } catch (Exception $e) {
+            Log::error("General Exception trying get ALL PLATFORM_SERIES paginated by page {$page}. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             if ($e instanceof HttpException) {
                 throw $e;
             }
@@ -104,7 +108,7 @@ class PlatformSerieService implements PlatformSerieContract
             Log::error("Get Serie by SERIE_ID {$id} failed. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);
         } catch (Exception $e) {
-            Log::error("General Exception. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
+            Log::error("General Exception trying get PLATFORMS by SERIE_ID {$id}. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, Constants::TXT_INTERNAL_SERVER_ERROR_CODE);
         }
     }
@@ -134,7 +138,7 @@ class PlatformSerieService implements PlatformSerieContract
             Log::error("Get Platform by PLATFORM_ID {$id} failed. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);
         } catch (Exception $e) {
-            Log::error("General Exception. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
+            Log::error("General Exception trying get SERIES by PLATFORM_ID {$id}. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, Constants::TXT_INTERNAL_SERVER_ERROR_CODE);
         }
     }
@@ -188,7 +192,7 @@ class PlatformSerieService implements PlatformSerieContract
             $serie = $this->serieContract->getById($serieId);
 
             // Get currently associated platforms, including removed ones
-            $currentPlatformIds = $serie->platforms()->withTrashed()->pluck(self::PLATFORMS_OBJECT .'.'. Utils::ID_FIELD)->toArray();
+            $currentPlatformIds = $serie->platforms()->withTrashed()->pluck(self::PLATFORMS_OBJECT . '.' . Utils::ID_FIELD)->toArray();
 
             $platformsToRestore = [];
 
@@ -231,7 +235,7 @@ class PlatformSerieService implements PlatformSerieContract
         try {
             return DB::transaction(function () use ($serieId, $platformIds) {
 
-                $this->checkSerieAndPlatforms($serieId, $platformIds);
+                $this->checkSerieAndPlatformsBeforeDelete($serieId, $platformIds);
 
                 PlatformSerie::where(self::SERIE_ID_FIELD, $serieId)
                     ->whereIn(self::PLATFORM_ID_FIELD, $platformIds)
@@ -241,6 +245,40 @@ class PlatformSerieService implements PlatformSerieContract
         } catch (QueryException $e) {
             Log::error("Error during delete platform series records for SERIE_ID {$serieId}. Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new CantExecuteOperation(Constants::TXT_CANT_EXECUTE_OPERATION);
+        }
+    }
+
+    /**
+     * Check valid serie and platforms before delete
+     * @param int $serieId Serie Identifier
+     * @param array $platformIds Actor identifiers
+     * @throws HttpException Conflict if any of platforms ids can be deleted
+     */
+    private function checkSerieAndPlatformsBeforeDelete($serieId, $platformIds)
+    {
+        $this->serieContract->getById($serieId);
+        $platformIdsDeleted = [];
+        foreach ($platformIds as $platformItem) {
+            $actor = $this->platformContract->getById($platformItem);
+
+            $recordRelated = $actor->series()->wherePivot(self::SERIE_ID_FIELD, $serieId)->first();
+            if (!$recordRelated) {
+                Log::warning("No se puede eliminar la PLATAFORMA {$platformItem}, no se encuentra relacionada con la SERIE {$serieId}");
+                throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
+            }
+
+            $recordAlreadyDeleted = $actor->series()->withTrashed()->wherePivot(self::SERIE_ID_FIELD, $serieId)->wherePivot(self::PLATFORM_ID_FIELD, $platformItem)->first();
+
+            if ($recordAlreadyDeleted && $recordAlreadyDeleted->pivot->deleted_at !== null) {
+                $platformIdsDeleted[] = $platformItem;
+            }
+        }
+
+        $platformIds = array_diff($platformIds, $platformIdsDeleted);
+
+        if (empty($platformIds)) {
+            Log::warning("Las plataformas de la serie {$serieId} ya han sido eliminadas de la tabla PLATFORM_SERIE");
+            throw new HttpException(Response::HTTP_CONFLICT, Constants::TXT_RECORD_DOESNT_SAVED);
         }
     }
 
@@ -256,23 +294,9 @@ class PlatformSerieService implements PlatformSerieContract
             $platform = $this->platformContract->getById($platformSerie[self::PLATFORM_ID_FIELD]);
             $serie = $this->serieContract->getById($platformSerie[self::SERIE_ID_FIELD]);
 
-            $serieObject = [
-                Utils::ID_FIELD => $serie->id,
-                self::SERIE_TITLE_FIELD => $serie->title,
-                self::SERIE_SYNOPSIS_FIELD => $serie->synopsis,
-                self::SERIE_RELEASE_FIELD => $serie->release_date,
-                Utils::CREATED_AT_AUDIT_FIELD => $serie->created_at,
-                Utils::UPDATED_AT_AUDIT_FIELD => $serie->updated_at,
-            ];
-            $platformObject = [
-                Utils::ID_FIELD => $platform->id,
-                self::PLATFORM_NAME_FIELD => $platform->name,
-                self::PLATFORM_DESCRIPTION_FIELD => $platform->description,
-                self::PLATFORM_RELEASE_DATE_FIELD => $platform->release_date,
-                self::PLATFORM_LOGO_FIELD => $platform->logo,
-                Utils::CREATED_AT_AUDIT_FIELD => $platform->created_at,
-                Utils::UPDATED_AT_AUDIT_FIELD => $platform->updated_at,
-            ];
+            $serieObject = $this->makeSerieObject($serie);
+
+            $platformObject = $this->makePlatformObject($platform);
 
             $platformSerie = [
                 self::SERIES_OBJECT => $serieObject,
@@ -294,26 +318,12 @@ class PlatformSerieService implements PlatformSerieContract
         $serie = $platformSeries[self::SERIES_OBJECT];
 
         $platforms = $platformSeries[self::PLATFORMS_OBJECT]->map(function ($platform) {
-            return [
-                Utils::ID_FIELD => $platform->id,
-                self::PLATFORM_NAME_FIELD => $platform->name,
-                self::PLATFORM_DESCRIPTION_FIELD => $platform->description,
-                self::PLATFORM_RELEASE_DATE_FIELD => $platform->release_date,
-                self::PLATFORM_LOGO_FIELD => $platform->logo,
-                Utils::CREATED_AT_AUDIT_FIELD => $platform->created_at,
-                Utils::UPDATED_AT_AUDIT_FIELD => $platform->updated_at,
-            ];
+            return $this->makePlatformObject($platform);
         });
 
-        $data = [
-            Utils::ID_FIELD => $serie->id,
-            self::SERIE_TITLE_FIELD => $serie->title,
-            self::SERIE_SYNOPSIS_FIELD => $serie->synopsis,
-            self::SERIE_RELEASE_FIELD => $serie->release_date,
-            Utils::CREATED_AT_AUDIT_FIELD => $serie->created_at,
-            Utils::UPDATED_AT_AUDIT_FIELD => $serie->updated_at,
-            self::PLATFORMS_OBJECT => $platforms
-        ];
+        $data = $this->makeSerieObject($serie);
+
+        $data[self::PLATFORMS_OBJECT] = $platforms;
 
         return $data;
     }
@@ -329,17 +339,42 @@ class PlatformSerieService implements PlatformSerieContract
         $platform = $seriePlatforms[self::PLATFORMS_OBJECT];
 
         $series = $seriePlatforms[self::SERIES_OBJECT]->map(function ($serie) {
-            return [
-                Utils::ID_FIELD => $serie->id,
-                self::SERIE_TITLE_FIELD => $serie->title,
-                self::SERIE_SYNOPSIS_FIELD => $serie->synopsis,
-                self::SERIE_RELEASE_FIELD => $serie->release_date,
-                Utils::CREATED_AT_AUDIT_FIELD => $serie->created_at,
-                Utils::UPDATED_AT_AUDIT_FIELD => $serie->updated_at,
-            ];
+            return $this->makeSerieObject($serie);
         });
 
-        $data = [
+        $data = $this->makePlatformObject($platform);
+
+        $data[self::SERIES_OBJECT] = $series;
+
+        return $data;
+    }
+
+    /**
+     * Make Serie Object
+     * @param Serie $serie Serie model
+     * @return array Serie object built
+     */
+    private function makeSerieObject(Serie $serie)
+    {
+        return [
+            Utils::ID_FIELD => $serie->id,
+            self::SERIE_TITLE_FIELD => $serie->title,
+            self::SERIE_SYNOPSIS_FIELD => $serie->synopsis,
+            self::SERIE_RELEASE_FIELD => $serie->release_date,
+            Utils::CREATED_AT_AUDIT_FIELD => $serie->created_at,
+            Utils::UPDATED_AT_AUDIT_FIELD => $serie->updated_at,
+        ];
+    }
+
+    /**
+     * Make Platform Object
+     * @param Platform $platform Plaform model
+     * @return array Platform object built
+     */
+    private function makePlatformObject(Platform $platform)
+    {
+
+        return [
             Utils::ID_FIELD => $platform->id,
             self::PLATFORM_NAME_FIELD => $platform->name,
             self::PLATFORM_DESCRIPTION_FIELD => $platform->description,
@@ -347,10 +382,7 @@ class PlatformSerieService implements PlatformSerieContract
             self::PLATFORM_LOGO_FIELD => $platform->logo,
             Utils::CREATED_AT_AUDIT_FIELD => $platform->created_at,
             Utils::UPDATED_AT_AUDIT_FIELD => $platform->updated_at,
-            self::SERIES_OBJECT => $series
         ];
-
-        return $data;
     }
 
     /**
