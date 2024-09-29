@@ -25,6 +25,8 @@ use App\Http\Services\Implementations\PlatformService;
 use App\Http\Services\Implementations\PersonService;
 use App\Http\Services\Implementations\PlatformSerieService;
 use App\Http\Services\Implementations\SerieService;
+use App\Models\Serie;
+use App\Observers\SerieObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -51,6 +53,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Serie::observe(SerieObserver::class);
     }
 }
