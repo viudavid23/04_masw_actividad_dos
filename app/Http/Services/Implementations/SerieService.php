@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -47,10 +48,13 @@ class SerieService implements SerieContract
             }
             return $series;
         } catch (InvalidArgumentException $e) {
+            Log::warning("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_BAD_REQUEST, Constants::TXT_INVALID_PAGE_NUMBER);
         } catch (QueryException $e) {
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);
         } catch (Exception $e) {
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             if ($e instanceof HttpException) {
                 throw $e;
             }
@@ -72,10 +76,13 @@ class SerieService implements SerieContract
 
             return $serieSaved;
         } catch (ModelNotFoundException $e) {
+            Log::warning("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_NOT_FOUND, Constants::TXT_RECORD_NOT_FOUND_CODE);
         } catch (QueryException $e) {
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_FAILED_DEPENDENCY, Constants::TXT_FAILED_DEPENDENCY_CODE);
         } catch (Exception $e) {
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, Constants::TXT_INTERNAL_SERVER_ERROR_CODE);
         }
     }
@@ -97,7 +104,7 @@ class SerieService implements SerieContract
             $deletedSerie = $this->getSerieDeletedByTitle($title);
 
             if (!is_null($deletedSerie)) {
-
+                
                 $deletedSerie->restore();
 
                 $deletedSerie->fill($newSerie);
@@ -121,7 +128,7 @@ class SerieService implements SerieContract
                 return $serie;
             }
         } catch (QueryException $e) {
-
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new CantExecuteOperation(Constants::TXT_CANT_EXECUTE_OPERATION);
         }
     }
@@ -166,7 +173,7 @@ class SerieService implements SerieContract
 
             return $serieSaved;
         } catch (QueryException $e) {
-           
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new CantExecuteOperation(Constants::TXT_CANT_EXECUTE_OPERATION);
         }
     }
@@ -184,7 +191,7 @@ class SerieService implements SerieContract
                 return true;
             });
         } catch (QueryException $e) {
-
+            Log::error("Tracking -> Code: {$e->getCode()} Message: {$e->getMessage()} Exception: {$e}");
             throw new CantExecuteOperation(Constants::TXT_CANT_EXECUTE_OPERATION);
         }
     }
